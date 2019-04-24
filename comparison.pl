@@ -8,6 +8,14 @@ use Getopt::Long;
 
 my $dir = getcwd;
 my $javaArgs = " -cp $dir";
+my $javaProjectName = undef;
+
+my $cPlusProjectName = undef;
+
+GetOptions (
+    "javaName=s"    => \$javaProjectName,
+    "cPlusName=s"   => \$cPlusProjectName
+) or die ("Error in command line arguments\n");
 
 #   params: engineCount | enginePath | scanParameter
 sub writeSettingsFile($$$)
@@ -21,6 +29,8 @@ sub writeSettingsFile($$$)
         my $scanParameter = "scan_parameter=\"$parameter\"\n";
         $settingsData += $engineName . $enginePath . $scanParameter;
     }
+    writeToFile("$dir\\ $javaProjectName", $settingsData);
+    writeToFile("$dir\\ $cPlusProjectName", $settingsData);
 }
 
 #   params: filePath | data
@@ -30,12 +40,12 @@ sub writeToFile($$)
 
     printf "Started writing $filePath";
 
-    open(handle, '>', $filePath) or die $!;
-    print handle $data;
-    close(handle);
+    open(HANDLE, '>', $filePath) or die $!;
+    print HANDLE $data;
+    close(HANDLE);
 
     printf "Settings file written";
 }
 
-
+writeSettingsFile(20, "C:\TC_ARTIFACTS\SpeedComparison\6\Testengine\TestEngines.exe", "-s");
 
