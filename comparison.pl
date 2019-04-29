@@ -9,8 +9,8 @@ use Getopt::Long;
 my $dir = getcwd;
 my $javaArgs = " -cp $dir";
 my $javaProjectName = undef;
-
 my $cPlusProjectName = undef;
+my $enginePathParameter = undef;
 
 sub printUsage
 {
@@ -23,30 +23,32 @@ sub printUsage
 
 GetOptions (
     "javaName=s"    => \$javaProjectName,
-    "cPlusName=s"   => \$cPlusProjectName
+    "cPlusName=s"   => \$cPlusProjectName,
+    "engine=s"      => \$enginePathParameter
 ) or die ("Error in command line arguments\n");
 
 END {
     print "$javaProjectName\n$cPlusProjectName\n";
 }
 
-die(printUsage) unless ($javaProjectName && $cPlusProjectName);
+die(printUsage) unless ($javaProjectName && $cPlusProjectName && $enginePathParameter);
 
 #   params: engineCount | enginePath | scanParameter
 sub writeSettingsFile($$$)
 {
-    print "@_\n";
     my ($engineCount, $filePath, $parameter) = @_;
     my $settingsData = "";
-    print "$engineCount $filePath $parameter\n";
     for my $i (0 .. $engineCount) {
         my $engineName = "[TestEngine$i]\n";
         my $enginePath = "path=\"$filePath\"\n";
         my $scanParameter = "scan_parameter=\"$parameter\"\n";
         $settingsData .= $engineName . $enginePath . $scanParameter;
     }
-    writeToFile("$dir\\ $javaProjectName", $settingsData);
-    writeToFile("$dir\\ $cPlusProjectName", $settingsData);
+    mkdir("$dir\\"."$javaProjectName\\settings\\");
+    mkdir("$dir\\"."$cPlusProjectName\\settings\\");
+
+    writeToFile("$dir\\"."$javaProjectName\\settings\\settings.ini", $settingsData);
+    writeToFile("$dir\\"."$cPlusProjectName\\settings\\settings.ini", $settingsData);
 }
 
 #   params: filePath | data
@@ -63,5 +65,5 @@ sub writeToFile($$)
     printf "Settings file written";
 }
 
-writeSettingsFile(20, "C:\\TC_ARTIFACTS\\SpeedComparison\\6\\TestEngine\\TestEngines.exe", "-s");
+writeSettingsFile(20, $enginePathParameter, "-s");
 
